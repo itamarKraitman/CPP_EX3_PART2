@@ -9,7 +9,6 @@ namespace ariel
     private:
         int numerator;
         int denominator;
-        int findGcd() const;
 
     public:
         Fraction();
@@ -17,21 +16,22 @@ namespace ariel
         Fraction(double floatNumber);
         int getNumerator() const;
         int getDenominator() const;
-        void reduceFraction();
+        bool reduceFraction();
+        int findGcd(int numerator, int denominator) const;
 
         // overloading +,-,*,/,==,>,<,<=,>=,++,--,<<,>>
-        Fraction operator+(const Fraction &other) const;
-        Fraction operator-(const Fraction &other) const;
-        Fraction operator*(const Fraction &other) const;
-        Fraction operator/(const Fraction &other) const;
+        friend Fraction operator+(const Fraction &other1, const Fraction &other);
+        friend Fraction operator-(const Fraction &other1, const Fraction &other);
+        friend Fraction operator*(const Fraction &other1, const Fraction &other);
+        friend Fraction operator/(const Fraction &other1, const Fraction &other);
 
-        Fraction operator*(double floatNumber) const;
-        Fraction operator+(double floatNumber) const;
-        Fraction operator-(double floatNumber) const;
-        Fraction operator/(double floatNumber) const;
+        friend Fraction operator*(const Fraction &fraction, double floatNumber);
+        friend Fraction operator+(const Fraction &fraction, double floatNumber);
+        friend Fraction operator-(const Fraction &fraction, double floatNumber);
+        friend Fraction operator/(const Fraction &fractiob, double floatNumber);
 
-        Fraction operator++(int dummy_flag);
-        Fraction operator--(int dummy_flag);
+        friend Fraction operator++(Fraction& frac, int);
+        friend Fraction operator--(Fraction& frac, int);
         Fraction &operator++();
         Fraction &operator--();
 

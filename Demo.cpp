@@ -15,23 +15,41 @@ using namespace std;
 
 using namespace ariel;
 
+long findGcd(long numeartor, long denominator)
+{
+    if (numeartor == 0)
+        return denominator;
+    if (denominator == 0)
+        return numeartor;
 
-int main() {
-    Fraction a(5,3), b(14,21);
-    cout << "a: " << a << "b: " << b << endl;
-    cout << "a+b" << a+b << endl; 
-    cout << "a-b" << a-b << endl; 
-    cout << "a/b" << a/b << endl; 
-    cout << "a*b" << a*b << endl; 
-    cout << "2.3*b" << 2.3*b << endl; 
-    cout << "a+2.421" << a+2.421 << endl; 
-    Fraction c = a+b-1;
-    cout << c++ << endl;
-    cout << --c << endl;
+    if (numeartor == denominator)
+        return numeartor;
 
-    cout << "c >=b ? : " << (c >= b) << endl;
-    if (a > 1.1) cout << " a is bigger than 1.1" << endl;
-    else cout << " a is smaller than 1.1" << endl;
+    if (numeartor > denominator)
+        return findGcd(numeartor - denominator, denominator);
+    return findGcd(numeartor, denominator - numeartor);
+}
+int main()
+{
+    // Fraction a(5,3), b(14,21);
+    // cout << "a: " << a << "b: " << b << endl;
+    // cout << "a+b" << a+b << endl;
+    // cout << "a-b" << a-b << endl;
+    // cout << "a/b" << a/b << endl;
+    // cout << "a*b" << a*b << endl;
+    // cout << "2.3*b" << 2.3*b << endl;
+    // cout << "a+2.421" << a+2.421 << endl;
+    // Fraction c = a+b-1;
+    // cout << c++ << endl;
+    // cout << --c << endl;
 
+    // cout << "c >=b ? : " << (c >= b) << endl;
+    // if (a > 1.1) cout << " a is bigger than 1.1" << endl;
+    // else cout << " a is smaller than 1.1" << endl;
+
+   Fraction a{1, 3};
+   Fraction y = a + 4.321;
+   double x = 4.654;
+   cout << y << ", " << x + y << endl; 
 
 }
