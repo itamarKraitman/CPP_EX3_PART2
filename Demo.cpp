@@ -9,26 +9,14 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
-using namespace std;
+#include <limits>
+
 
 #include "sources/Fraction.hpp"
+using namespace std;
 
 using namespace ariel;
 
-long findGcd(long numeartor, long denominator)
-{
-    if (numeartor == 0)
-        return denominator;
-    if (denominator == 0)
-        return numeartor;
-
-    if (numeartor == denominator)
-        return numeartor;
-
-    if (numeartor > denominator)
-        return findGcd(numeartor - denominator, denominator);
-    return findGcd(numeartor, denominator - numeartor);
-}
 int main()
 {
     // Fraction a(5,3), b(14,21);
@@ -47,9 +35,10 @@ int main()
     // if (a > 1.1) cout << " a is bigger than 1.1" << endl;
     // else cout << " a is smaller than 1.1" << endl;
 
-   Fraction a{1, 3};
-   Fraction y = a + 4.321;
-   double x = 4.654;
-   cout << y << ", " << x + y << endl; 
-
+    Fraction a(2,5);
+    Fraction b(4,5);
+    Fraction c = a - b;
+    Fraction d(0.4);
+    cout << d - b<< endl;
+    cout << c << endl;
 }

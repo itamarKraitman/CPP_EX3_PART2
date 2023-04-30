@@ -27,6 +27,11 @@ namespace ariel
     }
     Fraction::Fraction(double floatNumber) // https://www.geeksforgeeks.org/convert-given-float-value-to-equivalent-fraction/
     {
+        if (floatNumber == 0)
+        {
+            throw invalid_argument("Dividing by zero");
+        }
+        
         size_t decimalPointPos = std::to_string(floatNumber).find(".");
         size_t numbrOfDigitsAfterPoint = std::to_string(floatNumber).size() - decimalPointPos - 1;
 
@@ -46,6 +51,21 @@ namespace ariel
         // reduce
         reduceFraction();
     }
+
+    Fraction::Fraction(const Fraction &frac) : numerator(frac.numerator), denominator(frac.denominator)
+    {
+        if (denominator < 0)
+        {
+            this->numerator *= -1;
+            this->denominator *= -1;
+        }
+
+        if (denominator == 0)
+        {
+            throw std::invalid_argument("Dividing by zero");
+        }
+        reduceFraction();
+    }
     int Fraction::getNumerator() const { return this->numerator; }
     int Fraction::getDenominator() const { return this->denominator; }
 
@@ -62,83 +82,111 @@ namespace ariel
         return false; // did not make any redue operation
     }
 
-    int Fraction::findGcd(int numerator, int denominator) const // for fraction reduce
+    int Fraction::findGcd(int first, int second)
     {
-        return __gcd(numerator, denominator);
+        return __gcd(first, second);
+    }
+
+    int Fraction::findLcm(const Fraction &first, const Fraction &second)
+    {
+        int firstDenominator = first.getDenominator();
+        int secondDenominator = second.getDenominator();
+
+        return abs(firstDenominator * secondDenominator) / findGcd(firstDenominator, secondDenominator);
+    }
+
+    bool Fraction::checkOverflow(long long first, long long second)
+    {
+        constexpr long long max_int = std::numeric_limits<int>::max();
+        constexpr long long min_int = std::numeric_limits<int>::min();
+
+        if (first > max_int || second > max_int || first < min_int || second < min_int)
+        {
+            return true;
+        }
+        return false;
     }
 
     // overloading +,-,*,/,==,>,<,<=,>=,++,--,<<,>>
-    Fraction operator+(const Fraction &other1, const Fraction &other)
+    Fraction operator+(const Fraction &first, const Fraction &second)
     {
-        if (other1.denominator == other.denominator)
+        Fraction result;
+        long long newNumerator, newDenominator = first.denominator;
+        if (first.denominator == second.denominator)
         {
-            return Fraction(other1.numerator + other.numerator, other1.denominator);
+            newNumerator = first.numerator + second.numerator;
         }
         else
         {
-            int newNumerator = (other1.numerator * other.denominator) + (other.numerator * other1.denominator);
-            int newDenominator = other1.denominator * other.denominator;
-            return Fraction(newNumerator, newDenominator);
+            newNumerator = ((long long)first.numerator * (long long)second.denominator) + ((long long)second.numerator * (long long)first.denominator);
+            newDenominator = (long long)first.denominator * (long long)second.denominator;
         }
-    }
-    Fraction operator-(const Fraction &other1, const Fraction &other)
-    {
-        if (other1.denominator == other.denominator)
+        if (Fraction::checkOverflow(newNumerator, newDenominator))
         {
-            return Fraction(other1.numerator - other.numerator, other1.denominator);
+            throw overflow_error("overflow");
+        }
+        
+        return Fraction(newNumerator, newDenominator);
+    }
+    Fraction operator-(const Fraction &first, const Fraction &second)
+    {
+        Fraction result;
+        long long newNumerator, newDenominator = first.denominator;
+        if (first.denominator == second.denominator)
+        {
+            newNumerator = first.numerator - second.numerator;
         }
         else
         {
-            int newNumerator = (other1.numerator * other.denominator) - (other.numerator * other1.denominator);
-            int newDenominator = other1.denominator * other.denominator;
-            return Fraction(newNumerator, newDenominator);
+            newNumerator = ((long long)first.numerator * (long long)second.denominator) - ((long long)second.numerator * (long long)first.denominator);
+            newDenominator = (long long)first.denominator * (long long)second.denominator;
         }
-    }
-    Fraction operator*(const Fraction &other1, const Fraction &other)
-    {
-        int nume = other1.numerator * other.numerator;
-        int deno = other1.denominator * other.denominator;
-        return Fraction(nume, deno);
-    }
-    Fraction operator/(const Fraction &other1, const Fraction &other)
-    {
-        if (other.numerator == 0)
+        if (Fraction::checkOverflow(newNumerator, newDenominator))
         {
-            throw std::runtime_error("Dividing by zero");
+            throw overflow_error("overflow");
         }
-        else
+        
+        return Fraction(newNumerator, newDenominator);
+    }
+    Fraction operator*(const Fraction &first, const Fraction &second)
+    {
+        int newNumerator = first.numerator * second.numerator;
+        int newDenominator = first.denominator * second.denominator;
+        if (Fraction::checkOverflow(newNumerator, newDenominator))
         {
-            int nume = other1.numerator * other.denominator;
-            int deno = other1.denominator * other.numerator;
-            return Fraction(nume, deno);
+            throw overflow_error("overflow");
         }
+        
+        return Fraction(newNumerator, newDenominator);
+    }
+    Fraction operator/(const Fraction &first, const Fraction &second)
+    {
+        // no need to check for dividing by zero in advance because its made in constructors
+        int newNumerator = first.numerator * second.denominator;
+        int newDenominator = first.denominator * second.numerator;
+        if (Fraction::checkOverflow(newNumerator, newDenominator))
+        {
+            throw overflow_error("overflow");
+        }
+        
+        return Fraction(newNumerator, newDenominator);
     }
 
-    Fraction operator*(const Fraction &fraction, double floatfloatNumber)
+    Fraction operator+(const Fraction &fraction, double floatNumber)
     {
-        Fraction temp = fraction * Fraction(floatfloatNumber);
-        Fraction reduced(temp.numerator, temp.denominator);
-        return reduced;
+        return fraction + Fraction(floatNumber);
     }
-    Fraction operator+(const Fraction &fraction, double floatfloatNumber)
+    Fraction operator-(const Fraction &fraction, double floatNumber)
     {
-        Fraction temp = fraction + Fraction(floatfloatNumber);
-        return temp;
+        return fraction - Fraction(floatNumber);
     }
-    Fraction operator-(const Fraction &fraction, double floatfloatNumber)
+    Fraction operator*(const Fraction &fraction, double floatNumber)
     {
-        Fraction temp = fraction - Fraction(floatfloatNumber);
-        return temp;
+        return fraction * Fraction(floatNumber);
     }
-    Fraction operator/(const Fraction &fraction, double floatfloatNumber)
+    Fraction operator/(const Fraction &fraction, double floatNumber)
     {
-        if (floatfloatNumber == 0.0)
-        {
-            throw std::runtime_error("Dividing by zero");
-        }
-
-        Fraction temp = fraction / Fraction(floatfloatNumber);
-        return temp;
+        return fraction / Fraction(floatNumber);
     }
 
     // postfix incerment and decement
@@ -169,54 +217,20 @@ namespace ariel
 
     Fraction operator+(double floatNumber, const Fraction &frac1)
     {
-        double roundedNumber = round(floatNumber * 1000) / 1000;
-        int newNumerator = round(roundedNumber * 1000);
-        Fraction floatAsFraction(newNumerator, 1000);
-        return floatAsFraction + frac1;
+        
+        return frac1 + Fraction(floatNumber);
     }
     Fraction operator-(double floatNumber, const Fraction &frac1)
     {
-
-        Fraction floatAsFraction(floatNumber);
-        Fraction temp = floatAsFraction - frac1;
-        temp.reduceFraction();
-        return temp;
+        return  Fraction(floatNumber) - frac1;
     }
     Fraction operator*(double floatNumber, const Fraction &frac1)
     {
-        Fraction floatAsFraction(floatNumber);
-        Fraction temp = floatAsFraction * frac1;
-        temp.reduceFraction();
-        return temp;
+        return frac1 * Fraction(floatNumber);
     }
     Fraction operator/(double floatNumber, const Fraction &frac1)
     {
-        if (frac1.numerator == 0)
-        {
-            throw std::runtime_error("Dividing by zero");
-        }
-
-        Fraction floatAsFraction(floatNumber);
-        Fraction temp = floatAsFraction / frac1;
-        temp.reduceFraction();
-        return temp;
-    }
-
-    static int findGcd(int firstDenominator, int secondDenominator) // for finding lcm
-    {
-        if (secondDenominator == 0) // 5/2 and 6/1, lcm of  2 and 1 is 2
-        {
-            return firstDenominator;
-        }
-        return findGcd(secondDenominator, firstDenominator % secondDenominator);
-    }
-
-    static int findLcm(Fraction first, Fraction second)
-    {
-        int firstDenominator = first.getDenominator();
-        int secondDenominator = second.getDenominator();
-
-        return abs(firstDenominator * secondDenominator) / findGcd(firstDenominator, secondDenominator);
+        return Fraction(floatNumber) / frac1;
     }
 
     bool operator==(const Fraction &frac1, const Fraction &frac2)
@@ -226,7 +240,7 @@ namespace ariel
             return frac1.getNumerator() == frac2.getNumerator();
         }
 
-        int lcm = findLcm(frac1, frac2);
+        int lcm = Fraction::findLcm(frac1, frac2);
         int firstFracLcmMultiply = frac1.getNumerator() * lcm / frac1.getDenominator();
         int secondFracLcmMultiply = frac2.getNumerator() * lcm / frac2.getDenominator();
 
@@ -239,7 +253,7 @@ namespace ariel
             return frac1.getNumerator() >= frac2.getNumerator();
         }
 
-        int lcm = findLcm(frac1, frac2);
+        int lcm = Fraction::findLcm(frac1, frac2);
         int firstFracLcmMultiply = frac1.getNumerator() * lcm / frac1.getDenominator();
         int secondFracLcmMultiply = frac2.getNumerator() * lcm / frac2.getDenominator();
 
@@ -252,7 +266,7 @@ namespace ariel
             return frac1.getNumerator() <= frac2.getNumerator();
         }
 
-        int lcm = findLcm(frac1, frac2);
+        int lcm = Fraction::findLcm(frac1, frac2);
         int firstFracLcmMultiply = frac1.getNumerator() * lcm / frac1.getDenominator();
         int secondFracLcmMultiply = frac2.getNumerator() * lcm / frac2.getDenominator();
 
@@ -265,7 +279,7 @@ namespace ariel
             return frac1.getNumerator() > frac2.getNumerator();
         }
 
-        int lcm = findLcm(frac1, frac2);
+        int lcm = Fraction::findLcm(frac1, frac2);
         int firstFracLcmMultiply = frac1.getNumerator() * lcm / frac1.getDenominator();
         int secondFracLcmMultiply = frac2.getNumerator() * lcm / frac2.getDenominator();
 
@@ -278,7 +292,7 @@ namespace ariel
             return frac1.getNumerator() < frac2.getNumerator();
         }
 
-        int lcm = findLcm(frac1, frac2);
+        int lcm = Fraction::findLcm(frac1, frac2);
         int firstFracLcmMultiply = frac1.getNumerator() * lcm / frac1.getDenominator();
         int secondFracLcmMultiply = frac2.getNumerator() * lcm / frac2.getDenominator();
 
@@ -288,56 +302,59 @@ namespace ariel
     bool operator==(double floatNumber, const Fraction &frac1)
     {
         double fracAsfloat = static_cast<double>(frac1.numerator) / frac1.denominator;
-        // return Fraction(floatfloatNumber) == frac1;
         return floatNumber == fracAsfloat;
     }
-    bool operator>=(double floatfloatNumber, const Fraction &frac1)
+    bool operator>=(double floatNumber, const Fraction &frac1)
     {
-        return Fraction(floatfloatNumber) >= frac1;
+        double fracAsfloat = static_cast<double>(frac1.numerator) / frac1.denominator;
+        return floatNumber >= fracAsfloat;
     }
-    bool operator<=(double floatfloatNumber, const Fraction &frac1)
+    bool operator<=(double floatNumber, const Fraction &frac1)
     {
-        return Fraction(floatfloatNumber) <= frac1;
+        double fracAsfloat = static_cast<double>(frac1.numerator) / frac1.denominator;
+        return floatNumber <= fracAsfloat;
     }
-    bool operator>(double floatfloatNumber, const Fraction &frac1)
+    bool operator>(double floatNumber, const Fraction &frac1)
     {
-        return Fraction(floatfloatNumber) > frac1;
+        double fracAsfloat = static_cast<double>(frac1.numerator) / frac1.denominator;
+        return floatNumber > fracAsfloat;
     }
-    bool operator<(double floatfloatNumber, const Fraction &frac1)
+    bool operator<(double floatNumber, const Fraction &frac1)
     {
-        return Fraction(floatfloatNumber) < frac1;
+        double fracAsfloat = static_cast<double>(frac1.numerator) / frac1.denominator;
+        return floatNumber < fracAsfloat;
     }
 
-    bool operator==(const Fraction &frac1, double floatfloatNumber)
+    bool operator==(const Fraction &frac1, double floatNumber)
     {
-        return frac1 == Fraction(floatfloatNumber);
+        return frac1 == Fraction(floatNumber);
     }
-    bool operator>=(const Fraction &frac1, double floatfloatNumber)
+    bool operator>=(const Fraction &frac1, double floatNumber)
     {
-        return frac1 >= Fraction(floatfloatNumber);
+        return frac1 >= Fraction(floatNumber);
     }
-    bool operator<=(const Fraction &frac1, double floatfloatNumber)
+    bool operator<=(const Fraction &frac1, double floatNumber)
     {
-        return frac1 <= Fraction(floatfloatNumber);
+        return frac1 <= Fraction(floatNumber);
     }
-    bool operator>(const Fraction &frac1, double floatfloatNumber)
+    bool operator>(const Fraction &frac1, double floatNumber)
     {
-        return frac1 > Fraction(floatfloatNumber);
+        return frac1 > Fraction(floatNumber);
     }
-    bool operator<(const Fraction &frac1, double floatfloatNumber)
+    bool operator<(const Fraction &frac1, double floatNumber)
     {
-        return frac1 < Fraction(floatfloatNumber);
+        return frac1 < Fraction(floatNumber);
     }
 
     std::ostream &operator<<(std::ostream &output, const Fraction &frac) { return (output << frac.getNumerator() << '/' << frac.getDenominator()); }
-    std::istream &operator>>(std::istream &input, Fraction& frac)
+    std::istream &operator>>(std::istream &input, Fraction &frac)
     {
-           
+
         if (input.peek() == EOF)
         {
             throw std::runtime_error("no input");
         }
-        
+
         input >> frac.numerator;
         if (input.peek() == EOF)
         {
@@ -347,4 +364,3 @@ namespace ariel
         return input;
     }
 }
-
