@@ -10,6 +10,8 @@
 #include <sstream>
 #include <stdexcept>
 #include <limits>
+#include <cmath>
+#include <algorithm>
 
 
 #include "sources/Fraction.hpp"
@@ -35,10 +37,8 @@ int main()
     // if (a > 1.1) cout << " a is bigger than 1.1" << endl;
     // else cout << " a is smaller than 1.1" << endl;
 
-    Fraction a(2,5);
-    Fraction b(4,5);
-    Fraction c = a - b;
-    Fraction d(0.4);
-    cout << d - b<< endl;
-    cout << c << endl;
+   Fraction a(-68650,75000);
+   cout << a << endl;
+
+    
 }

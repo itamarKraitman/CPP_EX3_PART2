@@ -27,26 +27,16 @@ namespace ariel
     }
     Fraction::Fraction(double floatNumber) // https://www.geeksforgeeks.org/convert-given-float-value-to-equivalent-fraction/
     {
-        if (floatNumber == 0)
-        {
-            throw invalid_argument("Dividing by zero");
-        }
-        
-        size_t decimalPointPos = std::to_string(floatNumber).find(".");
-        size_t numbrOfDigitsAfterPoint = std::to_string(floatNumber).size() - decimalPointPos - 1;
-
-        // round to 3 decimal places at most
-        double limitedToThreeNumber;
-        if (numbrOfDigitsAfterPoint > 3)
-        {
-            std::ostringstream stream;
-            stream << std::fixed << std::setprecision(3) << floatNumber;
-            limitedToThreeNumber = std::stod(stream.str());
-        }
-
+        double limitedToThreeDigits = std::round(floatNumber * 1000.0) / 1000.0;
         // convert to numerator and denominator
-        this->denominator = std::pow(10, numbrOfDigitsAfterPoint);
-        this->numerator = std::round(limitedToThreeNumber * denominator);
+        this->numerator = limitedToThreeDigits * 1000;
+        this->denominator = 1000;
+
+        if (this->denominator < 0)
+        {
+            this->numerator *= -1;
+            this->denominator *= -1;
+        }
 
         // reduce
         reduceFraction();
@@ -73,8 +63,13 @@ namespace ariel
     {
 
         int gcd = findGcd(this->numerator, this->denominator);
-        if (gcd > 1)
+        if (gcd != 1)
         {
+            if (gcd < 0)
+            {
+                gcd *= -1;
+            }
+            
             this->numerator /= gcd;
             this->denominator /= gcd;
             return true;
@@ -186,6 +181,7 @@ namespace ariel
     }
     Fraction operator/(const Fraction &fraction, double floatNumber)
     {
+        // checking of dividing by zero is made in constructor
         return fraction / Fraction(floatNumber);
     }
 
@@ -230,6 +226,7 @@ namespace ariel
     }
     Fraction operator/(double floatNumber, const Fraction &frac1)
     {
+        // checking of dividing by zero is made in constructor
         return Fraction(floatNumber) / frac1;
     }
 
@@ -343,7 +340,7 @@ namespace ariel
     }
     bool operator<(const Fraction &frac1, double floatNumber)
     {
-        return frac1 < Fraction(floatNumber);
+        return Fraction(floatNumber) > frac1;
     }
 
     std::ostream &operator<<(std::ostream &output, const Fraction &frac) { return (output << frac.getNumerator() << '/' << frac.getDenominator()); }
