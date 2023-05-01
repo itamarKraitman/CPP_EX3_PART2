@@ -156,6 +156,11 @@ namespace ariel
     }
     Fraction operator/(const Fraction &first, const Fraction &second)
     {
+        if (second.numerator == 0)
+        {
+            throw std::runtime_error("Dividing by zero");
+        }
+        
         // no need to check for dividing by zero in advance because its made in constructors
         long long newNumerator = static_cast<long long>(first.numerator) * static_cast<long long>(second.denominator);
         long long newDenominator = static_cast<long long>(first.denominator) * static_cast<long long>(second.numerator);
@@ -331,6 +336,17 @@ namespace ariel
             throw std::runtime_error("only one argument");
         }
         input >> frac.denominator;
+        if (frac.denominator == 0)
+        {
+            throw std::runtime_error("Dividing by Zero");
+        }
+        
+        else if (frac.denominator < 0) // move '-' to numerator
+        {
+            frac.numerator *= -1;
+            frac.denominator *= -1;
+        }
+        
         return input;
     }
 }
