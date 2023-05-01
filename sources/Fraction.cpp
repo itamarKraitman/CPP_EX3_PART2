@@ -42,20 +42,6 @@ namespace ariel
         reduceFraction();
     }
 
-    Fraction::Fraction(const Fraction &frac) : numerator(frac.numerator), denominator(frac.denominator)
-    {
-        if (denominator < 0)
-        {
-            this->numerator *= -1;
-            this->denominator *= -1;
-        }
-
-        if (denominator == 0)
-        {
-            throw std::invalid_argument("Dividing by zero");
-        }
-        reduceFraction();
-    }
     int Fraction::getNumerator() const { return this->numerator; }
     int Fraction::getDenominator() const { return this->denominator; }
 
@@ -330,12 +316,18 @@ namespace ariel
         {
             throw std::runtime_error("no input");
         }
-        input >> frac.numerator;
+        if (!(input >> frac.numerator))
+        {
+            throw std::runtime_error("Couldn't read numerator");
+        }
         if (input.peek() == EOF)
         {
             throw std::runtime_error("only one argument");
         }
-        input >> frac.denominator;
+        if (!(input >> frac.denominator))
+        {
+            throw std::runtime_error("Couldn't read denominator");
+        }
         if (frac.denominator == 0)
         {
             throw std::runtime_error("Dividing by Zero");

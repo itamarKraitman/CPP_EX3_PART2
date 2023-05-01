@@ -16,7 +16,6 @@ namespace ariel
         Fraction();
         Fraction(int numerator, int denominator);
         Fraction(float floatNumber);
-        Fraction(const Fraction &frac);
         int getNumerator() const;
         int getDenominator() const;
         bool reduceFraction();
