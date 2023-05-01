@@ -12,6 +12,7 @@
 #include <limits>
 #include <cmath>
 #include <algorithm>
+#include <iomanip>
 
 
 #include "sources/Fraction.hpp"
@@ -39,6 +40,9 @@ int main()
 
    Fraction a(-68650,75000);
    cout << a << endl;
+   float s = 5465.1541561;
+   float ss = std::round(s * 1000.0) / 1000.0;
+   cout << ss << endl; 
 
     
 }
