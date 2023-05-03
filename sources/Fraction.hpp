@@ -10,7 +10,6 @@ namespace ariel
         int numerator;
         int denominator;
         static int findGcd(int first, int second);
-        static int findLcm(const Fraction &first, const Fraction &second);
 
     public:
         Fraction();

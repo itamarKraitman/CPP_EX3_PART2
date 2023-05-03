@@ -68,14 +68,6 @@ namespace ariel
         return __gcd(first, second);
     }
 
-    int Fraction::findLcm(const Fraction &first, const Fraction &second)
-    {
-        int firstDenominator = first.getDenominator();
-        int secondDenominator = second.getDenominator();
-
-        return abs(firstDenominator * secondDenominator) / findGcd(firstDenominator, secondDenominator);
-    }
-
     bool Fraction::checkOverflow(long long first, long long second)
     {
         constexpr long long max_int = std::numeric_limits<int>::max();
@@ -146,7 +138,7 @@ namespace ariel
         {
             throw std::runtime_error("Dividing by zero");
         }
-        
+
         // no need to check for dividing by zero in advance because its made in constructors
         long long newNumerator = static_cast<long long>(first.numerator) * static_cast<long long>(second.denominator);
         long long newDenominator = static_cast<long long>(first.denominator) * static_cast<long long>(second.numerator);
@@ -174,32 +166,6 @@ namespace ariel
     {
         // checking of dividing by zero is made in constructor
         return fraction / Fraction(floatNumber);
-    }
-
-    // postfix incerment and decement
-    Fraction operator++(Fraction &frac, int)
-    {
-        Fraction copy(frac.getNumerator(), frac.getDenominator());
-        ++frac;
-        return copy;
-    }
-    Fraction operator--(Fraction &frac, int)
-    {
-        Fraction copy(frac.getNumerator(), frac.getDenominator());
-        --frac;
-        return copy;
-    }
-
-    // prefix incerment and decement
-    Fraction &Fraction::operator++()
-    {
-        this->numerator += denominator;
-        return *this;
-    }
-    Fraction &Fraction::operator--()
-    {
-        this->numerator -= this->denominator;
-        return *this;
     }
 
     Fraction operator+(float floatNumber, const Fraction &frac1)
@@ -304,6 +270,32 @@ namespace ariel
         return Fraction(floatNumber) < frac1;
     }
 
+    // postfix incerment and decement
+    Fraction operator++(Fraction &frac, int)
+    {
+        Fraction copy(frac.getNumerator(), frac.getDenominator());
+        ++frac;
+        return copy;
+    }
+    Fraction operator--(Fraction &frac, int)
+    {
+        Fraction copy(frac.getNumerator(), frac.getDenominator());
+        --frac;
+        return copy;
+    }
+
+    // prefix incerment and decement
+    Fraction &Fraction::operator++()
+    {
+        this->numerator += denominator;
+        return *this;
+    }
+    Fraction &Fraction::operator--()
+    {
+        this->numerator -= this->denominator;
+        return *this;
+    }
+
     std::ostream &operator<<(std::ostream &output, const Fraction &frac)
     {
         output << frac.getNumerator() << '/' << frac.getDenominator();
@@ -332,13 +324,13 @@ namespace ariel
         {
             throw std::runtime_error("Dividing by Zero");
         }
-        
+
         else if (frac.denominator < 0) // move '-' to numerator
         {
             frac.numerator *= -1;
             frac.denominator *= -1;
         }
-        
+
         return input;
     }
 }
