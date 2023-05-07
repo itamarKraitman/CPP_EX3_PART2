@@ -1,3 +1,7 @@
+#ifndef FRACTION_HPP
+#define FRACTION_HPP
+
+
 #include <iostream>
 
 namespace ariel
@@ -61,3 +65,5 @@ namespace ariel
         friend std::istream &operator>>(std::istream &input, Fraction &frac);
     };
 }
+
+#endif
