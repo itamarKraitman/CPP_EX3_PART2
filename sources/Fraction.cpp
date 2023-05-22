@@ -15,11 +15,19 @@ namespace ariel
     {
         if (denominator < 0)
         {
+            if (numerator > 0)
+            {
             this->numerator *= -1;
             this->denominator *= -1;
+            }
+            else // numerator < 0 (ie. -2/-3) 
+            {
+                this->numerator *= -1;
+                this->denominator *= -1;
+            }
         }
 
-        if (denominator == 0)
+        if (denominator == 0 && numerator != 0)
         {
             throw std::invalid_argument("Dividing by zero");
         }
