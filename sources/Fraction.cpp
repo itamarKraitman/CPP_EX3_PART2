@@ -17,10 +17,10 @@ namespace ariel
         {
             if (numerator > 0)
             {
-            this->numerator *= -1;
-            this->denominator *= -1;
+                this->numerator *= -1;
+                this->denominator *= -1;
             }
-            else // numerator < 0 (ie. -2/-3) 
+            else // numerator < 0 (ie. -2/-3)
             {
                 this->numerator *= -1;
                 this->denominator *= -1;
@@ -158,6 +158,7 @@ namespace ariel
         return Fraction(static_cast<int>(newNumerator), static_cast<int>(newDenominator));
     }
 
+    //* binary operators *//
     Fraction operator+(const Fraction &fraction, float floatNumber)
     {
         return fraction + Fraction(floatNumber);
@@ -195,16 +196,7 @@ namespace ariel
         return Fraction(floatNumber) / frac1;
     }
 
-    bool operator==(const Fraction &frac1, const Fraction &frac2)
-    {
-        float firstAsFloat = (float)frac1.numerator / frac1.denominator;
-        float secondAsFloat = (float)frac2.numerator / frac2.denominator;
-
-        float firstRounded = std::round(firstAsFloat * 1000.0) / 1000.0;
-        float secondRounded = std::round(secondAsFloat * 1000.0) / 1000.0;
-
-        return firstRounded == secondRounded;
-    }
+    //* logic operators *//
     bool operator>=(const Fraction &frac1, const Fraction &frac2)
     {
         int firstNewNumerator = frac1.numerator * frac2.denominator;
@@ -214,10 +206,11 @@ namespace ariel
     }
     bool operator<=(const Fraction &frac1, const Fraction &frac2)
     {
-        int firstNewNumerator = frac1.numerator * frac2.denominator;
-        int secondNewNumerator = frac2.numerator * frac1.denominator;
-
-        return firstNewNumerator <= secondNewNumerator;
+        return frac2 >= frac1;
+    }
+    bool operator==(const Fraction &frac1, const Fraction &frac2)
+    {
+        return (frac1 >= frac2 && frac2 >= frac1);
     }
     bool operator>(const Fraction &frac1, const Fraction &frac2)
     {
@@ -228,18 +221,7 @@ namespace ariel
     }
     bool operator<(const Fraction &frac1, const Fraction &frac2)
     {
-        int firstNewNumerator = frac1.numerator * frac2.denominator;
-        int secondNewNumerator = frac2.numerator * frac1.denominator;
-
-        return firstNewNumerator < secondNewNumerator;
-    }
-
-    bool operator==(const Fraction &frac1, float floatNumber)
-    {
-        float fractionAsFloat = (float)frac1.numerator / frac1.denominator;
-        float fractionRounded = std::round(fractionAsFloat * 1000.0) / 1000.0;
-
-        return fractionRounded == floatNumber;
+        return frac2 > frac1;
     }
     bool operator>=(const Fraction &frac1, float floatNumber)
     {
@@ -249,6 +231,10 @@ namespace ariel
     {
         return frac1 <= Fraction(floatNumber);
     }
+    bool operator==(const Fraction &frac1, float floatNumber)
+    {
+        return (frac1 >= floatNumber && frac1 <= floatNumber);
+    }
     bool operator>(const Fraction &frac1, float floatNumber)
     {
         return frac1 > Fraction(floatNumber);
@@ -257,10 +243,6 @@ namespace ariel
     {
         return frac1 < Fraction(floatNumber);
     }
-    bool operator==(float floatNumber, const Fraction &frac1)
-    {
-        return frac1 == floatNumber;
-    }
     bool operator>=(float floatNumber, const Fraction &frac1)
     {
         return Fraction(floatNumber) >= frac1;
@@ -268,6 +250,10 @@ namespace ariel
     bool operator<=(float floatNumber, const Fraction &frac1)
     {
         return Fraction(floatNumber) <= frac1;
+    }
+    bool operator==(float floatNumber, const Fraction &frac1)
+    {
+        return frac1 == floatNumber;
     }
     bool operator>(float floatNumber, const Fraction &frac1)
     {
